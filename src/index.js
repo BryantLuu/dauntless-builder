@@ -2,24 +2,80 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-function Square(props) {
+class Weapon extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return (
+      <div>
+        <select
+          className=""
+          onChange={this.props.selectWeaponCategory}
+        >
+          {
+            this.props.weaponsCategories.map((i) => {
+              return <option key={i} value={i}>{i}</option>
+            })
+          }
+        </select>
+        <select
+          className=""
+          onChange={this.props.selectWeapon}
+        >
+          {
+            this.props.weapons.map((i) => {
+              return <option key={i} value={i}>{i}</option>
+            })
+          }
+        </select>
+        <select
+          className="cell1"
+          // onChange={this.props.selectWeaponCell1}
+        >
+          {
+            this.props.weaponCells[0].map((i) => {
+              return <option key={i} value={i}>{i}</option>
+            })
+          }
+        </select>
+        <select
+          className="cell2"
+          // onChange={this.props.selectWeaponCell2}
+        >
+          {
+            this.props.weaponCells[1].map((i) => {
+              return <option key={i} value={i}>{i}</option>
+            })
+          }
+        </select>
+      </div>
+    );
+  }
+}
+function ItemBox(props) {
+  console.log(props)
   return (
-    <button
-      className="square"
-      onClick={props.onClick}
+    <select
+      className=""
+      onChange={props.selectItem}
     >
-      {props.value}
-    </button>
+      {
+        props.items.map((i) => {
+          return <option key={i} value={i}>{i}</option>
+        })
+      }
+    </select>
   );
 }
 
-class Board extends React.Component {
+class Inventory extends React.Component {
 
-  renderSquare(i) {
+  renderItem(items, selectItem) {
     return (
-        <Square
-          value={this.props.squares[i]}
-          onClick={() => this.props.onClick(i)}
+        <ItemBox
+          items={items}
+          selectItem={selectItem}
         />
     );
   }
@@ -27,129 +83,100 @@ class Board extends React.Component {
   render() {
     return (
       <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
+        <div className="">
+          <h2>Weapon</h2>
+          <Weapon
+            weaponsCategories={this.props.weaponsCategories}
+            selectWeaponCategory={this.props.selectWeaponCategory}
+            weapons={this.props.weapons}
+            selectWeapon={this.props.selectWeapon}
+            weaponCells={this.props.weaponCells}
+          />
+          <h2>Lantern</h2>
+          {this.renderItem(this.props.lanterns, this.props.selectLantern)}
         </div>
         <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
         </div>
         <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
         </div>
       </div>
     );
   }
+}
+
+const weapons = {
+  Swords: ['Recruit\'s Sword (Recruit)', 'Gnashsaber (Gnasher)'],
+  Axes: ['Recruit\s Axe (Recruit)', 'Gnashaxe (Gnasher)'],
+}
+
+const weaponToCell = {
+  [weapons['Swords'][0]]: ['None', 'None'],
+  [weapons['Swords'][1]]: ['Utility', 'Defense'],
+  [weapons['Axes'][0]]: ['None', 'None'],
+  [weapons['Axes'][1]]: ['Power', 'Utility'],
+}
+
+
+const lanterns = ['Recruit\'s Lantern', 'Drask\'s Fury']
+
+const cellToPerk = {
+  Utility: ['None', 'Aetherborne +3', 'Aetherborne +2'],
+  Defense: ['None', 'Assassin\'s Vigor +3', 'Assassin\'s Vigor +2'],
+  None: ['No Cell Slot'],
 }
 
 class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      history: [{
-        squares: Array(9).fill(null),
-      }],
-      stepNumber: 0,
-      xIsNext: true,
+      chosenWeaponCategory: 'Swords',
+      chosenWeapon: weapons['Swords'][0],
+      chosenLantern: lanterns[0],
     }
   }
-  handleClick(i) {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[this.state.stepNumber];
-    const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
-      return;
-    }
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
+  selectWeaponCategory = (event) => {
     this.setState({
-      history: history.concat([{
-        squares: squares,
-      }]),
-      stepNumber: history.length,
-      xIsNext: !this.state.xIsNext,
+      chosenWeaponCategory: event.target.value,
+      chosenWeapon: weapons[event.target.value][0],
     });
   }
-  jumpTo(step) {
+  selectWeapon = (event) => {
     this.setState({
-      stepNumber: step,
-      xIsNext: (step % 2) === 0,
-    })
+      chosenWeapon: event.target.value,
+    });
+  }
+  selectLantern = (event) => {
+    this.setState(
+      {chosenLantern: event.target.value}
+    );
   }
   render() {
-    const history = this.state.history;
-    const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
-    const moves = history.map((step, move) => {
-      const desc = move ?
-        'Go to move #' + move :
-        'Go to game start';
-      return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
-        </li>
-      );
-    });
-
-    let status;
-    if (winner) {
-      status = `Winner: ${winner}`
-    } else {
-      status = `Next player: ${this.state.xIsNext ? 'X' : 'O'}`;
-    }
-
     return (
       <div className="game">
         <div className="game-board">
-          <Board
-            squares={current.squares}
-            onClick={(i) => this.handleClick(i)}
+          <Inventory
+            weapons={weapons[this.state.chosenWeaponCategory]}
+            weaponsCategories={Object.keys(weapons)}
+            selectWeaponCategory={this.selectWeaponCategory}
+            chosenWeaponCategory={this.state.chosenWeaponCategory}
+            selectWeapon={this.selectWeapon}
+            chosenWeapon={this.state.chosenWeapon}
+            weaponCells={
+              [
+                cellToPerk[weaponToCell[this.state.chosenWeapon][0]],
+                cellToPerk[weaponToCell[this.state.chosenWeapon][1]],
+              ]
+            }
+            lanterns={lanterns}
+            selectLantern={this.selectLantern}
+            chosenLantern={this.state.chosenLantern}
           />
         </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ol>{moves}</ol>
-          <ol>{this.state.stepNumber}</ol>
+        <div className="stats-info">
         </div>
       </div>
     );
   }
-}
-const weapon = {
-  sword: [],
-  spear: [],
-}
-
-const cellMap = {
-  power: ['cell1', 'cell2'],
-}
-
-const cellToPerk = {
-
-}
-
-function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
-    }
-  }
-  return null;
 }
 
 // ========================================
