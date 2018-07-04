@@ -1,148 +1,229 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Inventory from './Components/Inventory';
 import './index.css';
 
-class Weapon extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-  render() {
-    return (
-      <div>
-        <select
-          className=""
-          onChange={this.props.selectWeaponCategory}
-        >
-          {
-            this.props.weaponsCategories.map((i) => {
-              return <option key={i} value={i}>{i}</option>
-            })
-          }
-        </select>
-        <select
-          className=""
-          onChange={this.props.selectWeapon}
-        >
-          {
-            this.props.weapons.map((i) => {
-              return <option key={i} value={i}>{i}</option>
-            })
-          }
-        </select>
-        <select
-          className="cell1"
-          // onChange={this.props.selectWeaponCell1}
-        >
-          {
-            this.props.weaponCells[0].map((i) => {
-              return <option key={i} value={i}>{i}</option>
-            })
-          }
-        </select>
-        <select
-          className="cell2"
-          // onChange={this.props.selectWeaponCell2}
-        >
-          {
-            this.props.weaponCells[1].map((i) => {
-              return <option key={i} value={i}>{i}</option>
-            })
-          }
-        </select>
-      </div>
-    );
-  }
-}
-function ItemBox(props) {
-  console.log(props)
-  return (
-    <select
-      className=""
-      onChange={props.selectItem}
-    >
-      {
-        props.items.map((i) => {
-          return <option key={i} value={i}>{i}</option>
-        })
-      }
-    </select>
-  );
-}
-
-class Inventory extends React.Component {
-
-  renderItem(items, selectItem) {
-    return (
-        <ItemBox
-          items={items}
-          selectItem={selectItem}
-        />
-    );
-  }
-
-  render() {
-    return (
-      <div>
-        <div className="">
-          <h2>Weapon</h2>
-          <Weapon
-            weaponsCategories={this.props.weaponsCategories}
-            selectWeaponCategory={this.props.selectWeaponCategory}
-            weapons={this.props.weapons}
-            selectWeapon={this.props.selectWeapon}
-            weaponCells={this.props.weaponCells}
-          />
-          <h2>Lantern</h2>
-          {this.renderItem(this.props.lanterns, this.props.selectLantern)}
-        </div>
-        <div className="board-row">
-        </div>
-        <div className="board-row">
-        </div>
-      </div>
-    );
-  }
-}
+const weaponCategories = [
+  {
+    name: 'Sword',
+    selected: true,
+  },
+  {
+    name: 'Axe',
+  },
+]
 
 const weapons = {
-  Swords: ['Recruit\'s Sword (Recruit)', 'Gnashsaber (Gnasher)'],
-  Axes: ['Recruit\s Axe (Recruit)', 'Gnashaxe (Gnasher)'],
-}
+  None: [
+    {
+      name: 'None',
+      url: 'No Weapon',
+      cell1: 'None',
+      cell2: 'None',
+    }
+  ],
+  Sword: [
+    {
+      name: 'Training Sword',
+      url: 'images/weapons/swords/training.png',
+      cell1: 'None',
+      cell2: 'None',
+    },
+    {
+      name: 'Recruit\'s Sword (Recruit)',
+      url: 'images/weapons/swords/recruit.png',
+      cell1: 'None',
+      cell2: 'None',
+    },
+    {
+      name: 'Gnashsaber (Gnasher)',
+      url: 'images/weapons/swords/gnashsaber.png',
+      cell1: 'Utility',
+      cell2: 'Defense',
+      perks: {
+        Ragehunter: 2,
+      },
+    },
+    {
+      name: 'Shrikesaber (Shrike)',
+      url: 'images/weapons/swords/shrikesaber.png',
+      cell1: 'Mobility',
+      cell2: 'Mobility',
+      perks: {
+      },
+      unique: ['+30 Part Damage on Next Hit After a Dodge'],
+    },
+    {
+      name: 'Quillripper',
+      url: 'images/weapons/swords/quillripper.png',
+      cell1: 'Technique',
+      cell2: 'Defense',
+      perks: {
+        BladeStorm: 2,
+      }
+    },
+    {
+      name: 'Skarnsaber',
+      url: 'images/weapons/swords/quillripper.png',
+      cell1: 'Defense',
+      cell2: 'Defense',
+      perks: {
+        'Weighted Strikes': 2,
+      }
 
-const weaponToCell = {
-  [weapons['Swords'][0]]: ['None', 'None'],
-  [weapons['Swords'][1]]: ['Utility', 'Defense'],
-  [weapons['Axes'][0]]: ['None', 'None'],
-  [weapons['Axes'][1]]: ['Power', 'Utility'],
+    }
+  ],
+  Axe: [
+    {
+      name: 'Recruit\s Axe (Recruit)',
+      url: 'images/weapons/axes/recruit.png',
+      cell1: 'None',
+      cell2: 'None',
+    },
+    {
+      name: 'Gnashaxe (Gnasher)',
+      url: 'images/weapons/axes/gnashaxe.png',
+      cell1: 'Power',
+      cell2: 'Utility',
+    },
+    {
+      name: 'Shrike Axe (Shrike)',
+      url: 'images/weapons/axes/shrike.png',
+      cell1: 'Power',
+      cell2: 'Technique',
+    },
+  ],
 }
-
 
 const lanterns = ['Recruit\'s Lantern', 'Drask\'s Fury']
 
-const cellToPerk = {
-  Utility: ['None', 'Aetherborne +3', 'Aetherborne +2'],
-  Defense: ['None', 'Assassin\'s Vigor +3', 'Assassin\'s Vigor +2'],
-  None: ['No Cell Slot'],
+const cells = {
+  Defense: {
+    url: 'images/cells/defense.png',
+    selection: {
+      'Assassin\'s Vigour': [1, 2, 3],
+      'Bloodless': [1, 2, 3],
+      'Fireproof': [1, 2, 3],
+      'Fortress': [1, 2, 3],
+      'Insulated': [1, 2, 3],
+      'Nine Lives': [1, 2, 3],
+      'Shellshock Resist': [1, 2, 3],
+      'Sturdy': [1, 2, 3],
+      'Tough': [1, 2, 3],
+      'Warmth': [1, 2, 3],
+    }
+  },
+  Mobility: {
+    url: 'images/cells/mobility.png',
+    selection: {
+      'Assassin\'s Vigour': [1, 2, 3],
+      'Bloodless': [1, 2, 3],
+      'Fireproof': [1, 2, 3],
+      'Fortress': [1, 2, 3],
+      'Insulated': [1, 2, 3],
+      'Nine Lives': [1, 2, 3],
+      'Shellshock Resist': [1, 2, 3],
+      'Sturdy': [1, 2, 3],
+      'Tough': [1, 2, 3],
+      'Warmth': [1, 2, 3],
+    }
+  },
+  Power: {
+    url: 'images/cells/power.png',
+    selection: {
+      'Assassin\'s Vigour': [1, 2, 3],
+      'Bloodless': [1, 2, 3],
+      'Fireproof': [1, 2, 3],
+      'Fortress': [1, 2, 3],
+      'Insulated': [1, 2, 3],
+      'Nine Lives': [1, 2, 3],
+      'Shellshock Resist': [1, 2, 3],
+      'Sturdy': [1, 2, 3],
+      'Tough': [1, 2, 3],
+      'Warmth': [1, 2, 3],
+    }
+  },
+  Technique: {
+    url: 'images/cells/technique.png',
+    selection: {
+      'Assassin\'s Vigour': [1, 2, 3],
+      'Bloodless': [1, 2, 3],
+      'Fireproof': [1, 2, 3],
+      'Fortress': [1, 2, 3],
+      'Insulated': [1, 2, 3],
+      'Nine Lives': [1, 2, 3],
+      'Shellshock Resist': [1, 2, 3],
+      'Sturdy': [1, 2, 3],
+      'Tough': [1, 2, 3],
+      'Warmth': [1, 2, 3],
+    }
+  },
+  Utility: {
+    url: 'images/cells/utility.png',
+    selection: {
+      'Assassin\'s Vigour': [1, 2, 3],
+      'Bloodless': [1, 2, 3],
+      'Fireproof': [1, 2, 3],
+      'Fortress': [1, 2, 3],
+      'Insulated': [1, 2, 3],
+      'Nine Lives': [1, 2, 3],
+      'Shellshock Resist': [1, 2, 3],
+      'Sturdy': [1, 2, 3],
+      'Tough': [1, 2, 3],
+      'Warmth': [1, 2, 3],
+    }
+  },
+  None: {
+    selection: {
+      'None': [''],
+    }
+  }
 }
 
 class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      chosenWeaponCategory: 'Swords',
-      chosenWeapon: weapons['Swords'][0],
+      weapons: weapons[weaponCategories[0].name],
+      weaponCategories: weaponCategories,
+      chosenWeaponCategory: weaponCategories[0],
+      chosenWeapon: weapons['None'][0],
       chosenLantern: lanterns[0],
+      weaponCells: [
+        cells[weapons['None'][0].cell1],
+        cells[weapons['None'][0].cell2],
+      ],
     }
   }
-  selectWeaponCategory = (event) => {
+  selectWeaponCategory = (index) => {
+    const weaponCategories = [...this.state.weaponCategories].map((i) => {
+      i.selected = false;
+      return i;
+    })
+    weaponCategories[index].selected = true;
     this.setState({
-      chosenWeaponCategory: event.target.value,
-      chosenWeapon: weapons[event.target.value][0],
+      weaponCategories: weaponCategories,
+      chosenWeaponCategory: weaponCategories[0],
+      chosenWeapon: weapons['None'][0],
+      weapons: weapons[weaponCategories[index].name].map((i) => {
+        i.selected = false;
+        return i;
+      }),
     });
   }
-  selectWeapon = (event) => {
+  selectWeapon = (index) => {
+    const weapons = [...this.state.weapons].map((i)=> {
+      i.selected = false
+      return i
+    })
+    weapons[index].selected = true;
     this.setState({
-      chosenWeapon: event.target.value,
+      weapons,
+      chosenWeapon: weapons[index],
+      weaponCells: [
+        {...cells[weapons[index]['cell1']]},
+        {...cells[weapons[index]['cell2']]}
+      ],
     });
   }
   selectLantern = (event) => {
@@ -155,18 +236,13 @@ class Game extends React.Component {
       <div className="game">
         <div className="game-board">
           <Inventory
-            weapons={weapons[this.state.chosenWeaponCategory]}
-            weaponsCategories={Object.keys(weapons)}
+            weapons={this.state.weapons}
+            weaponsCategories={weaponCategories}
             selectWeaponCategory={this.selectWeaponCategory}
             chosenWeaponCategory={this.state.chosenWeaponCategory}
             selectWeapon={this.selectWeapon}
             chosenWeapon={this.state.chosenWeapon}
-            weaponCells={
-              [
-                cellToPerk[weaponToCell[this.state.chosenWeapon][0]],
-                cellToPerk[weaponToCell[this.state.chosenWeapon][1]],
-              ]
-            }
+            weaponCells={this.state.weaponCells}
             lanterns={lanterns}
             selectLantern={this.selectLantern}
             chosenLantern={this.state.chosenLantern}

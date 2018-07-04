@@ -48,3 +48,39 @@ ol, ul {
 .game-info {
   margin-left: 20px;
 }
+
+.weapon-category {
+  display: inline-block;
+  margin: 5px;
+  border-style: solid;
+  border-color: black;
+  padding: 5px;
+}
+
+.selected-weapon-category {
+  border-color: yellow;
+}
+
+.item {
+  display: inline-block;
+  border-color: white;
+  border-style: solid;
+}
+
+.selected {
+  border-style: solid;
+  border-color: green;
+}
+
+.item-image {
+  padding: 2px;
+  width:200px;
+}
+
+.item-name {
+  text-align:center;
+}
+
+.cell {
+  background-color: black;
+}
